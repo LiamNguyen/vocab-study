@@ -80,9 +80,11 @@ const App = () => {
             id="outlined-helperText"
             label="Vastaus"
             onKeyDown={handleNextQuestion}
+            fullWidth
           />
         </div>
         <div id='next-button'>
+          <h3>{`${currentQuestion}/${testSet.length}`}</h3>
           <Button variant="contained" onClick={handleNextQuestion}>Next</Button>
         </div>
       </div>

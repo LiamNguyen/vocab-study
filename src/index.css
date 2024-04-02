@@ -63,13 +63,37 @@ h2 {
   justify-content: space-between;
 }
 
-#question-card #next-button h3 {
-  color: #3eb489;
-}
-
 #question-card #next-button button {
   background-color: #3eb489;
   width: 100px;
   margin-top: 10px;
   margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+#question-card #next-button h3 {
+  color: #3eb489;
+}
+
+#result-modal span {
+  font-size: 30px;
+}
+
+#result-modal #continue-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+#result-modal #continue-button button {
+  background-color: #3eb489;
+  border-radius: 10px;
+  height: 45px;
+}
+
+#result-modal #header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }

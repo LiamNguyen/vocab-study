@@ -7,6 +7,7 @@ import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
 import { LANG, Question, UnrefinedQuestion } from './types';
+import { ResultModal } from './ResultModal';
 
 const randomizeLangSelection = (testSet: UnrefinedQuestion[]): Question[] => {
   return testSet.map((question: Question) => {
@@ -51,9 +52,10 @@ const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
   }
 }
 
-const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean => {
-  return correctAnswer.trim().toLowerCase().includes(userAnswer.toLowerCase().trim())
-}
+const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean =>
+  userAnswer.length > 0 &&
+  correctAnswer.trim().toLowerCase().includes(userAnswer.toLowerCase().trim())
+
 
 const updateTestResult = (
   testSet: Question[],
@@ -77,6 +79,7 @@ const App = () => {
   const [testSet, setTestSet] = useState(designTestSet(vocabulary) as Question[])
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [userAnswer, setUserAnswer] = useState('')
+  const [resultModalOpen, setResultModalOpen] = useState(false)
 
   useEffect(() => {
     // localStorage.setItem('testSet', JSON.stringify(testSet))
@@ -89,25 +92,31 @@ const App = () => {
   const handleKeyDown = (e: any) => {
     if (e.keyCode !== 13) return
 
-    handleNextQuestion()
+    checkAnswer()
   }
 
   const handleInputChange = (e: any) => {
     setUserAnswer(e.target.value)
   }
 
-  const handleNextQuestion = () => {
+  const checkAnswer = () => {
     const updatedTestResult = updateTestResult(testSet, currentQuestion, userAnswer)
-    setTestSet(updatedTestResult)
-    console.log(updatedTestResult)
+    setTestSet(updatedTestResult) // Store user answer
+
+    setResultModalOpen(true)
 
     setUserAnswer('') // Clear input field
+  }
+
+  const handleResultModalClose = () => {
+    setResultModalOpen(false)
+
     const nextQuestion = currentQuestion + 1
     setCurrentQuestion(nextQuestion)
   }
 
   return (
-    <div className="App">
+    <div className='App'>
       <h1>Suomen kielen sanasto</h1>
       <div id='cat-img'><img src={catImg} alt='' /></div>
       <div id='question-card'>
@@ -125,9 +134,14 @@ const App = () => {
         </div>
         <div id='next-button'>
           <h3>{`${currentQuestion}/${testSet.length}`}</h3>
-          <Button variant="contained" onClick={handleNextQuestion}>Next</Button>
+          <Button variant='contained' onClick={checkAnswer}>Next</Button>
         </div>
       </div>
+      <ResultModal
+        open={resultModalOpen}
+        handleClose={handleResultModalClose}
+        question={find(testSet, matchesProperty('id', currentQuestion))}
+      />
     </div>
   );
 }

@@ -1,36 +1,14 @@
-import { TextField, Button } from '@mui/material'
-import { withStyles } from '@mui/styles'
+import { Button } from '@mui/material'
 import { useEffect, useState } from 'react';
 import { shuffle, find, matchesProperty } from 'lodash'
 
 import './App.css';
 import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
+import { CssTextField } from './CssTextField';
 
 const EN = 'en'
 const FI = 'fi'
-
-const CssTextField = withStyles({
-  root: {
-    '& label.Mui-focused': {
-      color: '#3eb489',
-    },
-    '& .MuiInput-underline:after': {
-      borderBottomColor: '#3eb489',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#3eb489',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3eb489',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#3eb489',
-      },
-    },
-  }
-})(TextField)
 
 const randomizeLangSelection = wordList => {
   return wordList.map(wordSet => {

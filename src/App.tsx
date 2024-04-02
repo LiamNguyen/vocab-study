@@ -6,24 +6,22 @@ import './App.css';
 import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
+import { LANG, Question, UnrefinedQuestion } from './types';
 
-const EN = 'en'
-const FI = 'fi'
-
-const randomizeLangSelection = wordList => {
-  return wordList.map(wordSet => {
+const randomizeLangSelection = (testSet: UnrefinedQuestion[]): Question[] => {
+  return testSet.map((question: Question) => {
     const randomInt = Math.floor(Math.random() * 2) // Only 0 or 1
-    const selectedLang = randomInt === 0 ? EN : FI
+    const selectedLang = randomInt === 0 ? LANG.EN : LANG.FI
 
-    return { ...wordSet, selectedLang }
+    return { ...question, selectedLang }
   })
 }
 
-export const addQuestionId = wordList => {
+export const addQuestionId = (testSet: Question[]): Question[] => {
   let id = 1
-  return wordList.map(wordSet => {
+  return testSet.map((question: Question) => {
     const wordSetWithId = {
-      ...wordSet,
+      ...question,
       id
     }
     id++
@@ -32,20 +30,20 @@ export const addQuestionId = wordList => {
   })
 }
 
-const designTestSet = wordList => {
-  const shuffledList = shuffle(wordList)
+const designTestSet = (testSet: UnrefinedQuestion[]): Question[] => {
+  const shuffledList = shuffle(testSet)
   const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
   const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
 
   return testSetWithQuestionId
 }
 
-const getQuestionAndAnswer = (testSet, currentQuestion) => {
+const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
   if (!testSet || testSet.length === 0) return
 
   const wordSet = find(testSet, matchesProperty('id', currentQuestion))
   const question = wordSet[wordSet.selectedLang]
-  const answer = wordSet[EN] === question ? wordSet[FI] : wordSet[EN]
+  const answer = wordSet[LANG.EN] === question ? wordSet[LANG.FI] : wordSet[LANG.EN]
 
   return {
     question,
@@ -54,8 +52,9 @@ const getQuestionAndAnswer = (testSet, currentQuestion) => {
 }
 
 const App = () => {
-  const [testSet] = useState(designTestSet(vocabulary))
+  const [testSet] = useState(designTestSet(vocabulary) as Question[])
   const [currentQuestion, setCurrentQuestion] = useState(1)
+  const [answerInput, setAnswerInput] = useState('')
 
   useEffect(() => {
     // localStorage.setItem('testSet', JSON.stringify(testSet))
@@ -65,15 +64,22 @@ const App = () => {
     // localStorage.setItem('currentQuestion', JSON.stringify(currentQuestion))
   }, [currentQuestion])
 
-  const handleNextQuestion = () => {
-    const nextQuestion = currentQuestion + 1
-    setCurrentQuestion(nextQuestion)
-  }
-
-  const handleKeyDown = e => {
+  const handleKeyDown = (e: any) => {
     if (e.keyCode !== 13) return
 
     handleNextQuestion()
+  }
+
+  const handleInputChange = (e: any) => {
+    setAnswerInput(e.target.value)
+  }
+
+  const handleNextQuestion = () => {
+
+
+    setAnswerInput('') // Clear input field
+    const nextQuestion = currentQuestion + 1
+    setCurrentQuestion(nextQuestion)
   }
 
   return (
@@ -87,7 +93,9 @@ const App = () => {
             id='standard-basic'
             label='Vastaus'
             variant='standard'
+            value={answerInput}
             onKeyDown={handleKeyDown}
+            onChange={handleInputChange}
             fullWidth
           />
         </div>

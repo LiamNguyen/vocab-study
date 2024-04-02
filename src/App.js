@@ -1,4 +1,5 @@
 import { TextField, Button } from '@mui/material'
+import { withStyles } from '@mui/styles'
 import { useEffect, useState } from 'react';
 import { shuffle, find, matchesProperty } from 'lodash'
 
@@ -8,6 +9,28 @@ import { vocabulary } from './assets/vocabulary'
 
 const EN = 'en'
 const FI = 'fi'
+
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: '#3eb489',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: '#3eb489',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#3eb489',
+      },
+      '&:hover fieldset': {
+        borderColor: '#3eb489',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#3eb489',
+      },
+    },
+  }
+})(TextField)
 
 const randomizeLangSelection = wordList => {
   return wordList.map(wordSet => {
@@ -69,6 +92,12 @@ const App = () => {
     setCurrentQuestion(nextQuestion)
   }
 
+  const handleKeyDown = e => {
+    if (e.keyCode !== 13) return
+
+    handleNextQuestion()
+  }
+
   return (
     <div className="App">
       <h1>Suomen kielen sanasto</h1>
@@ -76,10 +105,11 @@ const App = () => {
       <div id='question-card'>
         <h1>{getQuestionAndAnswer(testSet, currentQuestion)?.question}</h1>
         <div id='answer-input'>
-          <TextField
-            id="outlined-helperText"
-            label="Vastaus"
-            onKeyDown={handleNextQuestion}
+          <CssTextField
+            id='standard-basic'
+            label='Vastaus'
+            variant='standard'
+            onKeyDown={handleKeyDown}
             fullWidth
           />
         </div>

@@ -10,5 +10,7 @@ export interface UnrefinedQuestion {
 
 export interface Question extends UnrefinedQuestion {
   id: number,
-  selectedLang: LANG
+  selectedLang: LANG,
+  userAnswer?: string,
+  isCorrect?: boolean
 }

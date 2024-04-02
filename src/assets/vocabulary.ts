@@ -1,4 +1,6 @@
-export const vocabulary = [
+import { UnrefinedQuestion } from '../types';
+
+export const vocabulary: UnrefinedQuestion[] = [
   { fi: "Hei", en: "Hello" },
   { fi: "ja", en: "and" },
   { fi: "Tervetuloa!", en: "Welcome!" },
@@ -153,7 +155,7 @@ export const vocabulary = [
   { fi: "kreikka", en: "Greek" },
   { fi: "islanti", en: "Icelandic" },
   { fi: "arabia", en: "Arabic" },
-  { fi: "venäjä", en: "Russian" },
+  { fi: "venäjä", en: "Russia" },
   { fi: "urdu", en: "Urdu" },
   { fi: "Mistä sinä olet kotoisin?", en: "Where are you from?" },
   { fi: "Minkämaalainen sinä olet?", en: "Which country are you from?" },

@@ -51,10 +51,32 @@ const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
   }
 }
 
+const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean => {
+  return correctAnswer.trim().toLowerCase().includes(userAnswer.toLowerCase().trim())
+}
+
+const updateTestResult = (
+  testSet: Question[],
+  currentQuestion: number,
+  userAnswer: string
+): Question[] => {
+  const correctAnswer = getQuestionAndAnswer(testSet, currentQuestion).answer
+
+  return testSet.map((question: Question) => {
+    if (question.id !== currentQuestion) return { ...question }
+
+    return {
+      ...question,
+      userAnswer,
+      isCorrect: isAnswerCorrect(userAnswer, correctAnswer)
+    }
+  })
+}
+
 const App = () => {
-  const [testSet] = useState(designTestSet(vocabulary) as Question[])
+  const [testSet, setTestSet] = useState(designTestSet(vocabulary) as Question[])
   const [currentQuestion, setCurrentQuestion] = useState(1)
-  const [answerInput, setAnswerInput] = useState('')
+  const [userAnswer, setUserAnswer] = useState('')
 
   useEffect(() => {
     // localStorage.setItem('testSet', JSON.stringify(testSet))
@@ -71,13 +93,15 @@ const App = () => {
   }
 
   const handleInputChange = (e: any) => {
-    setAnswerInput(e.target.value)
+    setUserAnswer(e.target.value)
   }
 
   const handleNextQuestion = () => {
+    const updatedTestResult = updateTestResult(testSet, currentQuestion, userAnswer)
+    setTestSet(updatedTestResult)
+    console.log(updatedTestResult)
 
-
-    setAnswerInput('') // Clear input field
+    setUserAnswer('') // Clear input field
     const nextQuestion = currentQuestion + 1
     setCurrentQuestion(nextQuestion)
   }
@@ -93,7 +117,7 @@ const App = () => {
             id='standard-basic'
             label='Vastaus'
             variant='standard'
-            value={answerInput}
+            value={userAnswer}
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
             fullWidth

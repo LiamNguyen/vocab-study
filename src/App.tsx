@@ -8,6 +8,7 @@ import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
 import { LANG, Question, UnrefinedQuestion } from './types';
 import { ResultModal } from './ResultModal';
+import { isAnswerCorrect } from './utils';
 
 const randomizeLangSelection = (testSet: UnrefinedQuestion[]): Question[] => {
   return testSet.map((question: Question) => {
@@ -51,11 +52,6 @@ const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
     answer
   }
 }
-
-const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean =>
-  userAnswer.length > 0 &&
-  correctAnswer.trim().toLowerCase().includes(userAnswer.toLowerCase().trim())
-
 
 const updateTestResult = (
   testSet: Question[],

@@ -14,7 +14,7 @@ export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): bool
 
   for (let i = 0; i < userAnswer.length; i++) {
     // If the current character in user's answer matches the character in correct answer
-    if (correctAnswer.indexOf(userAnswer[i]) > currentMatch || correctAnswer.indexOf(userAnswer[i]) > 0) {
+    if (correctAnswer.indexOf(userAnswer[i]) > currentMatch || correctAnswer.indexOf(userAnswer[i]) > -1) {
       matchingChars++
       currentMatch++
       // If the current match length is the longest, update the longestMatch variable

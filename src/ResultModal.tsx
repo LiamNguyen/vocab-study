@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Emoji from 'react-emojis';
 import { Question } from './types';
+import { getQuestionAndAnswer } from './App';
 
 const style = {
   position: 'absolute',
@@ -37,6 +38,10 @@ export const ResultModal = ({ open, handleClose, question }: props) => (
     <Box sx={style}>
       <div id='header'>
         <Emoji emoji={getEmoji(question.isCorrect)} />
+      </div>
+      <div>
+        <h3>Correct answer: {getQuestionAndAnswer([question], question.id).answer}</h3>
+        <h3>Your answer: {question.userAnswer}</h3>
       </div>
       <div id='continue-button'>
         <Button variant='contained' onClick={handleClose}>Continue</Button>

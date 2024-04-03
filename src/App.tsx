@@ -40,7 +40,7 @@ const designTestSet = (testSet: UnrefinedQuestion[]): Question[] => {
   return testSetWithQuestionId
 }
 
-const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
+export const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
   if (!testSet || testSet.length === 0) return
 
   const wordSet = find(testSet, matchesProperty('id', currentQuestion))

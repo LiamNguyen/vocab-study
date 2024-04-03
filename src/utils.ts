@@ -12,7 +12,6 @@ export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): bool
   let longestMatch = 0
 
   for (let i = 0; i < userAnswer.length; i++) {
-    console.log(matchingChars, ' ', correctAnswer.indexOf(userAnswer[i]), ' ', userAnswer[i])
     let currentMatchIndex = correctAnswer.indexOf(userAnswer[i], i)
 
     // If the current character in user's answer matches the character in correct answer

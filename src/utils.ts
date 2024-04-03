@@ -10,25 +10,24 @@ export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): bool
 
   let matchingChars = 0
   let longestMatch = 0
-  let currentMatch = 0
 
   for (let i = 0; i < userAnswer.length; i++) {
+    console.log(matchingChars, ' ', correctAnswer.indexOf(userAnswer[i]), ' ', userAnswer[i])
+    let currentMatchIndex = correctAnswer.indexOf(userAnswer[i], i)
+
     // If the current character in user's answer matches the character in correct answer
-    if (correctAnswer.indexOf(userAnswer[i]) > currentMatch || correctAnswer.indexOf(userAnswer[i]) > -1) {
+    if (currentMatchIndex === i) {
       matchingChars++
-      currentMatch++
       // If the current match length is the longest, update the longestMatch variable
-      if (currentMatch > longestMatch) {
-        longestMatch = currentMatch
+      if (matchingChars > longestMatch) {
+        longestMatch = matchingChars
       }
 
       // If the matching characters count is equal to or greater than the required count, return true
-      if (matchingChars >= minMatchingChars) {
+      if (longestMatch >= minMatchingChars) {
         return true
       }
     } else {
-      // If there's no match, reset the current match count
-      currentMatch = 0
       // Reset the matching characters count to start matching from the beginning of correct answer again
       matchingChars = 0
     }

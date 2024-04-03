@@ -12,7 +12,7 @@ describe('isAnswerCorrect function', () => {
     const correctAnswer = 'this apple pie'
     const secondUserAnswer = 'uutise'
     const secondCorrectAnswer = 'uutiset'
-    // expect(isAnswerCorrect(userAnswer, correctAnswer)).toBe(true)
+    expect(isAnswerCorrect(userAnswer, correctAnswer)).toBe(true)
     expect(isAnswerCorrect(secondUserAnswer, secondCorrectAnswer)).toBe(true)
   })
 

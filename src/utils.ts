@@ -26,6 +26,10 @@ export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): bool
       if (longestMatch >= minMatchingChars) {
         return true
       }
+      // If the answer is too short (less than 4 chars), 2/3 is still correct
+      if (correctAnswer.length < 4 && i === 1) {
+        return matchingChars === 2
+      }
     } else {
       // Reset the matching characters count to start matching from the beginning of correct answer again
       matchingChars = 0

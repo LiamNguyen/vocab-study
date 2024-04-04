@@ -1,3 +1,7 @@
+import { orderBy } from 'lodash'
+
+import { LocalStorageItem, QuestionResult, TestHistory } from './types'
+
 export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean => {
   // Convert both answers to lowercase for case insensitivity
   userAnswer = userAnswer.toLowerCase().trim()
@@ -37,4 +41,55 @@ export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): bool
   }
   // If the loop completes without returning true, return false
   return false
+}
+
+export const fetchOngoingTest = (): QuestionResult[] => {
+  const onGoingTest = localStorage.getItem(LocalStorageItem.ONGOING_TEST)
+  return JSON.parse(onGoingTest) as QuestionResult[] || []
+}
+
+export const storeOngoingTest = (onGoingTest: QuestionResult[]) => {
+  localStorage.setItem(LocalStorageItem.ONGOING_TEST, JSON.stringify(onGoingTest))
+}
+
+export const fetchCurrentQuestionId = (): number => {
+  const currentQuestionId = localStorage.getItem(LocalStorageItem.CURRENT_QUESTION_ID)
+
+  if (!currentQuestionId) return 0
+
+  return parseInt(currentQuestionId)
+}
+
+export const storeCurrentQuestionId = (currentQuestionId: number) => {
+  localStorage.setItem(LocalStorageItem.CURRENT_QUESTION_ID, currentQuestionId.toString())
+}
+
+export const fetchTestHistory = (): TestHistory[] => {
+  const onGoingTest = localStorage.getItem(LocalStorageItem.TEST_HISTORY)
+  return JSON.parse(onGoingTest) as TestHistory[] || []
+}
+
+export const storeTestHistory = (testHistory: TestHistory[]) => {
+  localStorage.setItem(LocalStorageItem.ONGOING_TEST, JSON.stringify(testHistory))
+}
+
+export const updateTestHistory = (testResult: QuestionResult[]) => {
+  const testHistory = fetchTestHistory()
+
+  if (testHistory.length < 1 || testResult.length < 1) return
+
+  let orderedTestHistory = orderBy(testHistory, ['id'], ['desc'])
+  const latestTest = orderedTestHistory[0]
+
+  orderedTestHistory.push({
+    id: latestTest.id + 1,
+    testResult,
+    createdAt: new Date()
+  })
+
+  if (orderedTestHistory.length > 10) {
+    orderedTestHistory.pop()
+  }
+
+  storeTestHistory(orderedTestHistory)
 }

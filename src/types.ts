@@ -3,6 +3,17 @@ export enum LANG {
   FI = 'fi'
 }
 
+export enum LocalStorageItem {
+  ONGOING_TEST = 'onGoingTest',
+  TEST_HISTORY = 'testHistory',
+  CURRENT_QUESTION_ID = 'currentQuestionId'
+}
+
+export enum ActionName {
+  UPDATE_TEST_SET = 'update_test_set',
+  UPDATE_QUESTION_ID = 'update_question_id'
+}
+
 export interface Question {
   fi: string,
   en: string,
@@ -17,4 +28,15 @@ export interface QuestionResultWithoutId {
 
 export interface QuestionResult extends QuestionResultWithoutId {
   id: number
+}
+
+export interface TestHistory {
+  id: number,
+  testResult: QuestionResult[],
+  createdAt: Date
+}
+
+export interface AppState {
+  testSet: QuestionResult[],
+  currentQuestionId: number
 }

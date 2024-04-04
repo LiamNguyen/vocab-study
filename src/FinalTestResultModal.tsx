@@ -100,8 +100,8 @@ export const FinalTestResultModal = ({ open, handleClose, testSet }: props) => (
             Incorrect: <b>{testSet.filter(i => !i.isCorrect).length}</b>
           </span>
         </div>
-        {testSet.map(({ question, correctAnswer, userAnswer, isCorrect }) => (
-          <div style={resultCardItemStyle}>
+        {testSet.map(({ id, question, correctAnswer, userAnswer, isCorrect }) => (
+          <div key={id} style={resultCardItemStyle}>
             <span style={smallerTextStyle}>Question: <b>{question}</b></span>
             <span style={smallerTextStyle}>Correct answer: <b>{correctAnswer}</b></span>
             <span style={isCorrect ? smallerTextStyle : smallerWarningTextStyle}>

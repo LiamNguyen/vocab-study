@@ -1,14 +1,14 @@
 import { Button } from '@mui/material'
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { shuffle, find, matchesProperty, slice } from 'lodash'
 
 import './App.css';
 import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
-import { LANG, QuestionResult, Question, QuestionResultWithoutId } from './types';
+import { LANG, QuestionResult, Question, QuestionResultWithoutId, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
-import { isAnswerCorrect } from './utils';
+import { fetchCurrentQuestionId, fetchOngoingTest, isAnswerCorrect, storeCurrentQuestionId, storeOngoingTest } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal';
 
 const randomizeLangSelection = (testSet: Question[]) => {
@@ -35,8 +35,8 @@ export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
   })
 }
 
-const getCurrentQuestion = (testSet: QuestionResult[], currentQuestion: number): QuestionResult =>
-  find(testSet, matchesProperty('id', currentQuestion))
+const getCurrentQuestion = (testSet: QuestionResult[], currentQuestionId: number): QuestionResult =>
+  find(testSet, matchesProperty('id', currentQuestionId))
 
 const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionResult[] => {
   const shuffledList = shuffle(testSet)
@@ -48,13 +48,13 @@ const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionR
 
 const updateTestResult = (
   testSet: QuestionResult[],
-  currentQuestion: number,
+  currentQuestionId: number,
   userAnswer: string
 ): QuestionResult[] => {
-  const correctAnswer = getCurrentQuestion(testSet, currentQuestion).correctAnswer
+  const correctAnswer = getCurrentQuestion(testSet, currentQuestionId).correctAnswer
 
   return testSet.map((questionResult: QuestionResult) => {
-    if (questionResult.id !== currentQuestion) return { ...questionResult }
+    if (questionResult.id !== currentQuestionId) return { ...questionResult }
 
     return {
       ...questionResult,
@@ -64,20 +64,51 @@ const updateTestResult = (
   })
 }
 
+const reducer = (state: AppState, action: any) => {
+  switch (action.type) {
+    case ActionName.UPDATE_TEST_SET:
+      const newTestSet = action.testSet
+
+      if (newTestSet.length > 0) {
+        storeOngoingTest(newTestSet)
+      }
+
+      return { ...state, testSet: newTestSet }
+    case ActionName.UPDATE_QUESTION_ID:
+      const updatedCurrentQuestionId = action.currentQuestionId
+
+      storeCurrentQuestionId(updatedCurrentQuestionId)
+
+      return { ...state, currentQuestionId: updatedCurrentQuestionId }
+    default:
+      return
+  }
+}
+
 const App = () => {
-  const [testSet, setTestSet] = useState(designTestSet(vocabulary, 100) as QuestionResult[])
-  const [currentQuestion, setCurrentQuestion] = useState(1)
+  const [state, dispatch] = useReducer(reducer, { testSet: [], currentQuestionId: 1 })
   const [userAnswer, setUserAnswer] = useState('')
   const [resultModalOpen, setResultModalOpen] = useState(false)
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
 
   useEffect(() => {
-    // localStorage.setItem('testSet', JSON.stringify(testSet))
-  }, [testSet])
+    const onGoingTest = fetchOngoingTest()
+    if (onGoingTest?.length > 0) {
+      dispatchUpdateTestSet(onGoingTest)
+      dispatchUpdateCurrentQuestionId(fetchCurrentQuestionId())
+    } else {
+      dispatchUpdateTestSet(designTestSet(vocabulary, 100))
+      dispatchUpdateCurrentQuestionId(1)
+    }
+  }, [])
 
-  useEffect(() => {
-    // localStorage.setItem('currentQuestion', JSON.stringify(currentQuestion))
-  }, [currentQuestion])
+  const dispatchUpdateTestSet = (testSet: QuestionResult[]) => {
+    dispatch({ type: ActionName.UPDATE_TEST_SET, testSet })
+  }
+
+  const dispatchUpdateCurrentQuestionId = (currentQuestionId: number) => {
+    dispatch({ type: ActionName.UPDATE_QUESTION_ID, currentQuestionId })
+  }
 
   const handleKeyDown = (e: any) => {
     if (e.keyCode !== 13) return
@@ -90,8 +121,9 @@ const App = () => {
   }
 
   const checkAnswer = () => {
-    const updatedTestResult = updateTestResult(testSet, currentQuestion, userAnswer)
-    setTestSet(updatedTestResult) // Store user answer
+    const { testSet, currentQuestionId } = state
+    const updatedTestResult = updateTestResult(testSet, currentQuestionId, userAnswer)
+    dispatchUpdateTestSet(updatedTestResult) // Store user answer
 
     setResultModalOpen(true)
 
@@ -101,13 +133,15 @@ const App = () => {
   const handleResultModalClose = () => {
     setResultModalOpen(false)
 
-    if (currentQuestion === testSet.length) {
+    const { testSet, currentQuestionId } = state
+
+    if (currentQuestionId === testSet.length) {
       setfinalTestResultModalOpen(true)
       return
     }
 
-    const nextQuestion = currentQuestion + 1
-    setCurrentQuestion(nextQuestion)
+    const nextQuestion = currentQuestionId + 1
+    dispatchUpdateCurrentQuestionId(nextQuestion)
   }
 
   const handleFinalTestResultModalClose = () => {
@@ -118,34 +152,37 @@ const App = () => {
     <div className='App'>
       <h1>Suomen kielen sanasto</h1>
       <div id='cat-img'><img src={catImg} alt='' /></div>
-      <div id='question-card'>
-        <h1>{getCurrentQuestion(testSet, currentQuestion)?.question}</h1>
-        <div id='answer-input'>
-          <CssTextField
-            id='standard-basic'
-            label='Vastaus'
-            variant='standard'
-            value={userAnswer}
-            onKeyDown={handleKeyDown}
-            onChange={handleInputChange}
-            fullWidth
-          />
+      {state.testSet.length > 0 ? (<div>
+        <div id='question-card'>
+          <h1>{getCurrentQuestion(state.testSet, state.currentQuestionId)?.question}</h1>
+          <div id='answer-input'>
+            <CssTextField
+              id='standard-basic'
+              label='Vastaus'
+              variant='standard'
+              value={userAnswer}
+              onKeyDown={handleKeyDown}
+              onChange={handleInputChange}
+              fullWidth
+            />
+          </div>
+          <div id='next-button'>
+            <h3>{`${state.currentQuestionId}/${state.testSet.length}`}</h3>
+            <Button variant='contained' onClick={checkAnswer}>Next</Button>
+          </div>
         </div>
-        <div id='next-button'>
-          <h3>{`${currentQuestion}/${testSet.length}`}</h3>
-          <Button variant='contained' onClick={checkAnswer}>Next</Button>
-        </div>
-      </div>
-      <ResultModal
-        open={resultModalOpen}
-        handleClose={handleResultModalClose}
-        questionResult={getCurrentQuestion(testSet, currentQuestion)}
-      />
-      <FinalTestResultModal
-        open={finalTestResultModalOpen}
-        handleClose={handleFinalTestResultModalClose}
-        testSet={testSet}
-      />
+        <ResultModal
+          open={resultModalOpen}
+          handleClose={handleResultModalClose}
+          questionResult={getCurrentQuestion(state.testSet, state.currentQuestionId)}
+        />
+        <FinalTestResultModal
+          open={finalTestResultModalOpen}
+          handleClose={handleFinalTestResultModalClose}
+          testSet={state.testSet}
+        />
+      </div>) : <div />}
+
     </div>
   );
 }

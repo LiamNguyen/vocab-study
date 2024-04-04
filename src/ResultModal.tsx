@@ -2,6 +2,7 @@ import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Emoji from 'react-emojis';
+
 import { QuestionResult } from './types';
 
 const style = {

@@ -1,6 +1,6 @@
 import { Button } from '@mui/material'
 import { useEffect, useState } from 'react';
-import { shuffle, find, matchesProperty } from 'lodash'
+import { shuffle, find, matchesProperty, slice } from 'lodash'
 
 import './App.css';
 import catImg from './assets/study-cat.avif'
@@ -9,6 +9,7 @@ import { CssTextField } from './CssTextField';
 import { LANG, QuestionResult, Question, QuestionResultWithoutId } from './types';
 import { ResultModal } from './ResultModal';
 import { isAnswerCorrect } from './utils';
+import { FinalTestResultModal } from './FinalTestResultModal';
 
 const randomizeLangSelection = (testSet: Question[]) => {
   return testSet.map((testSetQuestion: Question) => {
@@ -37,12 +38,12 @@ export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
 const getCurrentQuestion = (testSet: QuestionResult[], currentQuestion: number): QuestionResult =>
   find(testSet, matchesProperty('id', currentQuestion))
 
-const designTestSet = (testSet: Question[]): QuestionResult[] => {
+const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionResult[] => {
   const shuffledList = shuffle(testSet)
   const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
   const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
 
-  return testSetWithQuestionId
+  return slice(testSetWithQuestionId, 0, numberOfQuestion)
 }
 
 const updateTestResult = (
@@ -64,10 +65,11 @@ const updateTestResult = (
 }
 
 const App = () => {
-  const [testSet, setTestSet] = useState(designTestSet(vocabulary) as QuestionResult[])
+  const [testSet, setTestSet] = useState(designTestSet(vocabulary, 100) as QuestionResult[])
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [userAnswer, setUserAnswer] = useState('')
   const [resultModalOpen, setResultModalOpen] = useState(false)
+  const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
 
   useEffect(() => {
     // localStorage.setItem('testSet', JSON.stringify(testSet))
@@ -99,8 +101,17 @@ const App = () => {
   const handleResultModalClose = () => {
     setResultModalOpen(false)
 
+    if (currentQuestion === testSet.length) {
+      setfinalTestResultModalOpen(true)
+      return
+    }
+
     const nextQuestion = currentQuestion + 1
     setCurrentQuestion(nextQuestion)
+  }
+
+  const handleFinalTestResultModalClose = () => {
+    setfinalTestResultModalOpen(false)
   }
 
   return (
@@ -129,6 +140,11 @@ const App = () => {
         open={resultModalOpen}
         handleClose={handleResultModalClose}
         questionResult={getCurrentQuestion(testSet, currentQuestion)}
+      />
+      <FinalTestResultModal
+        open={finalTestResultModalOpen}
+        handleClose={handleFinalTestResultModalClose}
+        testSet={testSet}
       />
     </div>
   );

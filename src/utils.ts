@@ -70,24 +70,35 @@ export const fetchTestHistory = (): TestHistory[] => {
 }
 
 export const storeTestHistory = (testHistory: TestHistory[]) => {
-  localStorage.setItem(LocalStorageItem.ONGOING_TEST, JSON.stringify(testHistory))
+  localStorage.setItem(LocalStorageItem.TEST_HISTORY, JSON.stringify(testHistory))
 }
 
 export const updateTestHistory = (testResult: QuestionResult[]) => {
-  const testHistory = fetchTestHistory()
+  if (testResult.length < 1) return
 
-  if (testHistory.length < 1 || testResult.length < 1) return
+  let testHistory = fetchTestHistory()
+
+  if (testHistory.length < 1) {
+    testHistory.push({
+      id: 1,
+      testResult,
+      createdAt: new Date()
+    })
+    storeTestHistory(testHistory)
+
+    return
+  }
 
   let orderedTestHistory = orderBy(testHistory, ['id'], ['desc'])
   const latestTest = orderedTestHistory[0]
 
-  orderedTestHistory.push({
+  orderedTestHistory.unshift({
     id: latestTest.id + 1,
     testResult,
     createdAt: new Date()
   })
-
-  if (orderedTestHistory.length > 10) {
+  if (orderedTestHistory.length > 6) {
+    console.log(orderedTestHistory)
     orderedTestHistory.pop()
   }
 

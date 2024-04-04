@@ -14,7 +14,7 @@ const boxStyle = {
   bgcolor: 'background.paper',
   p: 4,
   borderRadius: 5,
-  backgroundColor: '#073021',
+  backgroundColor: '#3eb489',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between'
@@ -71,7 +71,9 @@ const buttonContainerStyle: any = {
 }
 
 const buttonStyle = {
-  backgroundColor: '#3eb489',
+  color: '#3eb489',
+  fontWeight: 'bold',
+  backgroundColor: '#b6ffbb',
   borderRadius: '10px',
   height: '45px'
 }

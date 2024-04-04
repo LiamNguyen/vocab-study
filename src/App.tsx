@@ -8,7 +8,7 @@ import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
 import { LANG, QuestionResult, Question, QuestionResultWithoutId, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
-import { fetchCurrentQuestionId, fetchOngoingTest, isAnswerCorrect, storeCurrentQuestionId, storeOngoingTest } from './utils';
+import { fetchCurrentQuestionId, fetchOngoingTest, isAnswerCorrect, storeCurrentQuestionId, storeOngoingTest, updateTestHistory } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal';
 
 const randomizeLangSelection = (testSet: Question[]) => {
@@ -69,9 +69,7 @@ const reducer = (state: AppState, action: any) => {
     case ActionName.UPDATE_TEST_SET:
       const newTestSet = action.testSet
 
-      if (newTestSet.length > 0) {
-        storeOngoingTest(newTestSet)
-      }
+      storeOngoingTest(newTestSet)
 
       return { ...state, testSet: newTestSet }
     case ActionName.UPDATE_QUESTION_ID:
@@ -137,6 +135,8 @@ const App = () => {
 
     if (currentQuestionId === testSet.length) {
       setfinalTestResultModalOpen(true)
+      updateTestHistory(testSet)
+
       return
     }
 
@@ -146,6 +146,9 @@ const App = () => {
 
   const handleFinalTestResultModalClose = () => {
     setfinalTestResultModalOpen(false)
+
+    dispatchUpdateTestSet(designTestSet(vocabulary, 100))
+    dispatchUpdateCurrentQuestionId(1)
   }
 
   return (

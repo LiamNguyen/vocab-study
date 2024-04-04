@@ -6,22 +6,24 @@ import './App.css';
 import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
-import { LANG, Question, UnrefinedQuestion } from './types';
+import { LANG, QuestionResult, Question, QuestionResultWithoutId } from './types';
 import { ResultModal } from './ResultModal';
 import { isAnswerCorrect } from './utils';
 
-const randomizeLangSelection = (testSet: UnrefinedQuestion[]): Question[] => {
-  return testSet.map((question: Question) => {
+const randomizeLangSelection = (testSet: Question[]) => {
+  return testSet.map((testSetQuestion: Question) => {
     const randomInt = Math.floor(Math.random() * 2) // Only 0 or 1
     const selectedLang = randomInt === 0 ? LANG.EN : LANG.FI
+    const question = testSetQuestion[selectedLang]
+    const correctAnswer = testSetQuestion[LANG.EN] === question ? testSetQuestion[LANG.FI] : testSetQuestion[LANG.EN]
 
-    return { ...question, selectedLang }
+    return { question, correctAnswer }
   })
 }
 
-export const addQuestionId = (testSet: Question[]): Question[] => {
+export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
   let id = 1
-  return testSet.map((question: Question) => {
+  return testSet.map((question: QuestionResultWithoutId) => {
     const wordSetWithId = {
       ...question,
       id
@@ -32,7 +34,10 @@ export const addQuestionId = (testSet: Question[]): Question[] => {
   })
 }
 
-const designTestSet = (testSet: UnrefinedQuestion[]): Question[] => {
+const getCurrentQuestion = (testSet: QuestionResult[], currentQuestion: number): QuestionResult =>
+  find(testSet, matchesProperty('id', currentQuestion))
+
+const designTestSet = (testSet: Question[]): QuestionResult[] => {
   const shuffledList = shuffle(testSet)
   const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
   const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
@@ -40,31 +45,18 @@ const designTestSet = (testSet: UnrefinedQuestion[]): Question[] => {
   return testSetWithQuestionId
 }
 
-export const getQuestionAndAnswer = (testSet: Question[], currentQuestion: number) => {
-  if (!testSet || testSet.length === 0) return
-
-  const wordSet = find(testSet, matchesProperty('id', currentQuestion))
-  const question = wordSet[wordSet.selectedLang]
-  const answer = wordSet[LANG.EN] === question ? wordSet[LANG.FI] : wordSet[LANG.EN]
-
-  return {
-    question,
-    answer
-  }
-}
-
 const updateTestResult = (
-  testSet: Question[],
+  testSet: QuestionResult[],
   currentQuestion: number,
   userAnswer: string
-): Question[] => {
-  const correctAnswer = getQuestionAndAnswer(testSet, currentQuestion).answer
+): QuestionResult[] => {
+  const correctAnswer = getCurrentQuestion(testSet, currentQuestion).correctAnswer
 
-  return testSet.map((question: Question) => {
-    if (question.id !== currentQuestion) return { ...question }
+  return testSet.map((questionResult: QuestionResult) => {
+    if (questionResult.id !== currentQuestion) return { ...questionResult }
 
     return {
-      ...question,
+      ...questionResult,
       userAnswer,
       isCorrect: isAnswerCorrect(userAnswer, correctAnswer)
     }
@@ -72,7 +64,7 @@ const updateTestResult = (
 }
 
 const App = () => {
-  const [testSet, setTestSet] = useState(designTestSet(vocabulary) as Question[])
+  const [testSet, setTestSet] = useState(designTestSet(vocabulary) as QuestionResult[])
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [userAnswer, setUserAnswer] = useState('')
   const [resultModalOpen, setResultModalOpen] = useState(false)
@@ -116,7 +108,7 @@ const App = () => {
       <h1>Suomen kielen sanasto</h1>
       <div id='cat-img'><img src={catImg} alt='' /></div>
       <div id='question-card'>
-        <h1>{getQuestionAndAnswer(testSet, currentQuestion)?.question}</h1>
+        <h1>{getCurrentQuestion(testSet, currentQuestion)?.question}</h1>
         <div id='answer-input'>
           <CssTextField
             id='standard-basic'
@@ -136,7 +128,7 @@ const App = () => {
       <ResultModal
         open={resultModalOpen}
         handleClose={handleResultModalClose}
-        question={find(testSet, matchesProperty('id', currentQuestion))}
+        questionResult={getCurrentQuestion(testSet, currentQuestion)}
       />
     </div>
   );

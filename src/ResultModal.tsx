@@ -2,8 +2,7 @@ import { Button } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Emoji from 'react-emojis';
-import { Question } from './types';
-import { getQuestionAndAnswer } from './App';
+import { QuestionResult } from './types';
 
 const style = {
   position: 'absolute',
@@ -20,14 +19,14 @@ const style = {
 interface props {
   open: boolean,
   handleClose: () => void
-  question: Question
+  questionResult: QuestionResult
 }
 
 const getEmoji = (isCorrect: boolean): string =>
   isCorrect ? 'partying-face' : 'upside-down-face'
 
 
-export const ResultModal = ({ open, handleClose, question }: props) => (
+export const ResultModal = ({ open, handleClose, questionResult }: props) => (
   <Modal
     id='result-modal'
     open={open}
@@ -37,11 +36,11 @@ export const ResultModal = ({ open, handleClose, question }: props) => (
   >
     <Box sx={style}>
       <div id='header'>
-        <Emoji emoji={getEmoji(question.isCorrect)} />
+        <Emoji emoji={getEmoji(questionResult.isCorrect)} />
       </div>
       <div>
-        <h3>Correct answer: {getQuestionAndAnswer([question], question.id).answer}</h3>
-        <h3>Your answer: {question.userAnswer}</h3>
+        <h3>Correct answer: {questionResult.correctAnswer}</h3>
+        <h3>Your answer: {questionResult.userAnswer}</h3>
       </div>
       <div id='continue-button'>
         <Button variant='contained' onClick={handleClose}>Continue</Button>

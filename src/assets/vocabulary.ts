@@ -1,6 +1,6 @@
-import { UnrefinedQuestion } from '../types';
+import { Question } from '../types';
 
-export const vocabulary: UnrefinedQuestion[] = [
+export const vocabulary: Question[] = [
   { fi: "Hei", en: "Hello" },
   { fi: "ja", en: "and" },
   { fi: "Tervetuloa!", en: "Welcome!" },

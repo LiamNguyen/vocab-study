@@ -3,14 +3,18 @@ export enum LANG {
   FI = 'fi'
 }
 
-export interface UnrefinedQuestion {
+export interface Question {
   fi: string,
   en: string,
 }
 
-export interface Question extends UnrefinedQuestion {
-  id: number,
-  selectedLang: LANG,
+export interface QuestionResultWithoutId {
+  question: string,
+  correctAnswer: string,
   userAnswer?: string,
   isCorrect?: boolean
+}
+
+export interface QuestionResult extends QuestionResultWithoutId {
+  id: number
 }

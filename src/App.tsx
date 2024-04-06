@@ -7,11 +7,12 @@ import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
 import { QuestionResult, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
-import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
+import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, fetchTestHistory, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
 import { MAX_QUESTION } from './constants';
 import { restartButtonStyle, viewHistoryButtonStyle } from './AppStyles';
 import { TestHistoryModal } from './TestHistoryModal/TestHistoryModal';
+import { orderBy } from 'lodash';
 
 const reducer = (state: AppState, action: any) => {
   switch (action.type) {
@@ -38,6 +39,7 @@ const App = () => {
   const [resultModalOpen, setResultModalOpen] = useState(false)
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
   const [testHistoryModalOpen, setTestHistoryModalOpen] = useState(false)
+  const testHistory = fetchTestHistory()
 
   useEffect(() => {
     const onGoingTest = fetchOngoingTest()
@@ -71,7 +73,9 @@ const App = () => {
   const checkAnswer = () => {
     const { testSet, currentQuestionId } = state
     const updatedTestResult = updateTestResult(testSet, currentQuestionId, userAnswer)
-    dispatchUpdateTestSet(updatedTestResult) // Store user answer
+    const orderedTestSet = orderBy(updatedTestResult, ['isCorrect'], ['asc']) // Wrong questions first
+
+    dispatchUpdateTestSet(orderedTestSet) // Store user answer
 
     setResultModalOpen(true)
 
@@ -106,6 +110,7 @@ const App = () => {
   }
 
   const handleViewTestHistory = () => {
+    if (testHistory.length < 1) return
     setTestHistoryModalOpen(true)
   }
 
@@ -156,7 +161,11 @@ const App = () => {
           onClose={handleFinalTestResultModalClose}
           testSet={state.testSet}
         />
-        <TestHistoryModal open={testHistoryModalOpen} onClose={() => setTestHistoryModalOpen(false)} />
+        <TestHistoryModal
+          open={testHistoryModalOpen}
+          onClose={() => setTestHistoryModalOpen(false)}
+          testHistory={testHistory}
+        />
       </div>) : <div />}
     </div>
   );

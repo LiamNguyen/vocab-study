@@ -5,21 +5,20 @@ import Modal from '@mui/material/Modal';
 
 import { boxStyle, buttonContainerStyle, buttonStyle, resultContainerStyle } from './styles';
 import { ResultSummaryCard } from '../ResultSummaryCard';
-import { fetchTestHistory } from '../utils';
 import { useState } from 'react';
 import { FinalTestResultModal } from '../FinalTestResultModal/FinalTestResultModal';
 import { find, matchesProperty } from 'lodash';
 import { QuestionResult, TestHistory } from '../types';
 
 interface props {
-  open: boolean,
+  open: boolean
   onClose: () => void
+  testHistory: TestHistory[]
 }
 
-export const TestHistoryModal = ({ open, onClose }: props) => {
+export const TestHistoryModal = ({ open, onClose, testHistory }: props) => {
   const [testDetailOpen, setTestDetailOpen] = useState(false)
   const [chosenTestResult, setChosenTestResult] = useState([] as QuestionResult[])
-  const testHistory = fetchTestHistory()
 
   const handleCardClick = (testId: number) => {
     const chosenTest: TestHistory = find(testHistory, matchesProperty('id', testId))

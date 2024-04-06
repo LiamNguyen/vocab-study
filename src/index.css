@@ -96,3 +96,17 @@ h2 {
   flex-direction: row;
   justify-content: center;
 }
+
+
+
+.restart-dialog .MuiPaper-root {
+  background-color: #b6ffbb;
+}
+
+.restart-dialog .MuiTypography-root {
+  color: #3eb489;
+}
+
+.restart-dialog button {
+  color: #3eb489
+}

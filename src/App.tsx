@@ -1,5 +1,12 @@
 import { Button } from '@mui/material'
 import { useEffect, useReducer, useState } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { orderBy } from 'lodash';
+
 
 import './App.css';
 import catImg from './assets/study-cat.avif'
@@ -10,9 +17,8 @@ import { ResultModal } from './ResultModal';
 import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, fetchTestHistory, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
 import { MAX_QUESTION } from './constants';
-import { restartButtonStyle, viewHistoryButtonStyle } from './AppStyles';
+import { restartButtonStyle, restartDialogStyle, viewHistoryButtonStyle } from './AppStyles';
 import { TestHistoryModal } from './TestHistoryModal/TestHistoryModal';
-import { orderBy } from 'lodash';
 
 const reducer = (state: AppState, action: any) => {
   switch (action.type) {
@@ -39,6 +45,7 @@ const App = () => {
   const [resultModalOpen, setResultModalOpen] = useState(false)
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
   const [testHistoryModalOpen, setTestHistoryModalOpen] = useState(false)
+  const [restartDialogOpen, setRestartDialogOpen] = useState(false)
   const testHistory = fetchTestHistory()
 
   useEffect(() => {
@@ -105,14 +112,24 @@ const App = () => {
     dispatchUpdateCurrentQuestionId(1)
   }
 
-  const handleRestartTest = () => {
-    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
-    dispatchUpdateCurrentQuestionId(1)
+  const handleRestartButtonClick = () => {
+    setRestartDialogOpen(true)
+
   }
 
   const handleViewTestHistory = () => {
     if (testHistory.length < 1) return
     setTestHistoryModalOpen(true)
+  }
+
+  const handleRestartDialogClose = () => {
+    setRestartDialogOpen(false)
+  }
+
+  const handleRestartTest = () => {
+    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
+    dispatchUpdateCurrentQuestionId(1)
+    setRestartDialogOpen(false)
   }
 
   return (
@@ -140,7 +157,7 @@ const App = () => {
           <Button
             variant='text'
             style={restartButtonStyle}
-            onClick={handleRestartTest}
+            onClick={handleRestartButtonClick}
           >
             Restart test
           </Button>
@@ -167,6 +184,19 @@ const App = () => {
           onClose={() => setTestHistoryModalOpen(false)}
           testHistory={testHistory}
         />
+        <Dialog
+          className='restart-dialog'
+          open={restartDialogOpen}
+          keepMounted
+          onClose={handleRestartDialogClose}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle>{'Sure you wanna restart?'}</DialogTitle>
+          <DialogActions>
+            <Button onClick={handleRestartTest}>Restart</Button>
+            <Button onClick={handleRestartDialogClose}>Close</Button>
+          </DialogActions>
+        </Dialog>
       </div>) : <div />}
     </div>
   );

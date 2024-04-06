@@ -7,3 +7,7 @@ export const viewHistoryButtonStyle = {
   ...restartButtonStyle,
   margin: 0
 }
+
+export const restartDialogStyle = {
+  backgroundColor: '#b6ffbb'
+}

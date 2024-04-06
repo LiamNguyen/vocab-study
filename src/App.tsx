@@ -1,68 +1,17 @@
 import { Button } from '@mui/material'
 import { useEffect, useReducer, useState } from 'react';
-import { shuffle, find, matchesProperty, slice } from 'lodash'
 
 import './App.css';
 import catImg from './assets/study-cat.avif'
 import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
-import { LANG, QuestionResult, Question, QuestionResultWithoutId, AppState, ActionName } from './types';
+import { QuestionResult, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
-import { fetchCurrentQuestionId, fetchOngoingTest, isAnswerCorrect, storeCurrentQuestionId, storeOngoingTest, updateTestHistory } from './utils';
-import { FinalTestResultModal } from './FinalTestResultModal';
+import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
+import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
+import { MAX_QUESTION } from './constants';
 
-const randomizeLangSelection = (testSet: Question[]) => {
-  return testSet.map((testSetQuestion: Question) => {
-    const randomInt = Math.floor(Math.random() * 2) // Only 0 or 1
-    const selectedLang = randomInt === 0 ? LANG.EN : LANG.FI
-    const question = testSetQuestion[selectedLang]
-    const correctAnswer = testSetQuestion[LANG.EN] === question ? testSetQuestion[LANG.FI] : testSetQuestion[LANG.EN]
 
-    return { question, correctAnswer }
-  })
-}
-
-export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
-  let id = 1
-  return testSet.map((question: QuestionResultWithoutId) => {
-    const wordSetWithId = {
-      ...question,
-      id
-    }
-    id++
-
-    return wordSetWithId
-  })
-}
-
-const getCurrentQuestion = (testSet: QuestionResult[], currentQuestionId: number): QuestionResult =>
-  find(testSet, matchesProperty('id', currentQuestionId))
-
-const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionResult[] => {
-  const shuffledList = shuffle(testSet)
-  const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
-  const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
-
-  return slice(testSetWithQuestionId, 0, numberOfQuestion)
-}
-
-const updateTestResult = (
-  testSet: QuestionResult[],
-  currentQuestionId: number,
-  userAnswer: string
-): QuestionResult[] => {
-  const correctAnswer = getCurrentQuestion(testSet, currentQuestionId).correctAnswer
-
-  return testSet.map((questionResult: QuestionResult) => {
-    if (questionResult.id !== currentQuestionId) return { ...questionResult }
-
-    return {
-      ...questionResult,
-      userAnswer,
-      isCorrect: isAnswerCorrect(userAnswer, correctAnswer)
-    }
-  })
-}
 
 const reducer = (state: AppState, action: any) => {
   switch (action.type) {
@@ -95,7 +44,7 @@ const App = () => {
       dispatchUpdateTestSet(onGoingTest)
       dispatchUpdateCurrentQuestionId(fetchCurrentQuestionId())
     } else {
-      dispatchUpdateTestSet(designTestSet(vocabulary, 100))
+      dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
       dispatchUpdateCurrentQuestionId(1)
     }
   }, [])
@@ -147,7 +96,7 @@ const App = () => {
   const handleFinalTestResultModalClose = () => {
     setfinalTestResultModalOpen(false)
 
-    dispatchUpdateTestSet(designTestSet(vocabulary, 100))
+    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
     dispatchUpdateCurrentQuestionId(1)
   }
 

@@ -1,6 +1,7 @@
-import { orderBy } from 'lodash'
+import { find, matchesProperty, orderBy, shuffle, slice } from 'lodash'
 
-import { LocalStorageItem, QuestionResult, TestHistory } from './types'
+import { LANG, LocalStorageItem, Question, QuestionResult, QuestionResultWithoutId, TestHistory } from './types'
+import { MAX_HISTORY } from './constants'
 
 export const isAnswerCorrect = (userAnswer: string, correctAnswer: string): boolean => {
   // Convert both answers to lowercase for case insensitivity
@@ -97,10 +98,62 @@ export const updateTestHistory = (testResult: QuestionResult[]) => {
     testResult,
     createdAt: new Date()
   })
-  if (orderedTestHistory.length > 6) {
-    console.log(orderedTestHistory)
+  if (orderedTestHistory.length > MAX_HISTORY) {
     orderedTestHistory.pop()
   }
 
   storeTestHistory(orderedTestHistory)
+}
+
+const randomizeLangSelection = (testSet: Question[]) => {
+  return testSet.map((testSetQuestion: Question) => {
+    const randomInt = Math.floor(Math.random() * 2) // Only 0 or 1
+    const selectedLang = randomInt === 0 ? LANG.EN : LANG.FI
+    const question = testSetQuestion[selectedLang]
+    const correctAnswer = testSetQuestion[LANG.EN] === question ? testSetQuestion[LANG.FI] : testSetQuestion[LANG.EN]
+
+    return { question, correctAnswer }
+  })
+}
+
+export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
+  let id = 1
+  return testSet.map((question: QuestionResultWithoutId) => {
+    const wordSetWithId = {
+      ...question,
+      id
+    }
+    id++
+
+    return wordSetWithId
+  })
+}
+
+export const getCurrentQuestion = (testSet: QuestionResult[], currentQuestionId: number): QuestionResult =>
+  find(testSet, matchesProperty('id', currentQuestionId))
+
+export const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionResult[] => {
+  const shuffledList = shuffle(testSet)
+  const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
+  const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
+
+  return slice(testSetWithQuestionId, 0, numberOfQuestion)
+}
+
+export const updateTestResult = (
+  testSet: QuestionResult[],
+  currentQuestionId: number,
+  userAnswer: string
+): QuestionResult[] => {
+  const correctAnswer = getCurrentQuestion(testSet, currentQuestionId).correctAnswer
+
+  return testSet.map((questionResult: QuestionResult) => {
+    if (questionResult.id !== currentQuestionId) return { ...questionResult }
+
+    return {
+      ...questionResult,
+      userAnswer,
+      isCorrect: isAnswerCorrect(userAnswer, correctAnswer)
+    }
+  })
 }

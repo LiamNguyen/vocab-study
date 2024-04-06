@@ -16,14 +16,14 @@ const resultSummaryChartStyle: any = {
   width: '30%'
 }
 
-const resultSummaryStatsStyle: any = {
+export const resultSummaryStatsStyle: any = {
   flex: '1 1 auto',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around'
 }
 
-const statTextStyle: any = {
+export const statTextStyle: any = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-around'

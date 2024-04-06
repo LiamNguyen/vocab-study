@@ -97,7 +97,13 @@ h2 {
   justify-content: center;
 }
 
+#result-modal .MuiFormControlLabel-root {
+  margin-top: 10px;
+}
 
+#result-modal .MuiTypography-root {
+  font-size: 20px;
+}
 
 .restart-dialog .MuiPaper-root {
   background-color: #b6ffbb;

@@ -6,14 +6,27 @@ import Modal from '@mui/material/Modal';
 import { boxStyle, buttonContainerStyle, buttonStyle, resultContainerStyle } from './styles';
 import { ResultSummaryCard } from '../ResultSummaryCard';
 import { fetchTestHistory } from '../utils';
+import { useState } from 'react';
+import { FinalTestResultModal } from '../FinalTestResultModal/FinalTestResultModal';
+import { find, matchesProperty } from 'lodash';
+import { QuestionResult, TestHistory } from '../types';
 
 interface props {
   open: boolean,
-  handleClose: () => void
+  onClose: () => void
 }
 
-export const TestHistoryModal = ({ open, handleClose }: props) => {
+export const TestHistoryModal = ({ open, onClose }: props) => {
+  const [testDetailOpen, setTestDetailOpen] = useState(false)
+  const [chosenTestResult, setChosenTestResult] = useState([] as QuestionResult[])
   const testHistory = fetchTestHistory()
+
+  const handleCardClick = (testId: number) => {
+    const chosenTest: TestHistory = find(testHistory, matchesProperty('id', testId))
+
+    setChosenTestResult(chosenTest.testResult)
+    setTestDetailOpen(true)
+  }
 
   return (
     <Modal
@@ -25,15 +38,21 @@ export const TestHistoryModal = ({ open, handleClose }: props) => {
     >
       <Box sx={boxStyle}>
         <div style={resultContainerStyle}>
-          {testHistory.map(({ testResult }) => (
-            <ResultSummaryCard testSet={testResult} />
+          {testHistory.map(({ id, testResult }) => (
+            <ResultSummaryCard key={id} testId={id} testSet={testResult} onClick={handleCardClick} />
           ))}
         </div>
         <div style={buttonContainerStyle}>
-          <Button style={buttonStyle} variant='contained' onClick={handleClose}>
+          <Button style={buttonStyle} variant='contained' onClick={onClose}>
             Close
           </Button>
         </div>
+        <FinalTestResultModal
+          open={testDetailOpen}
+          onClose={() => setTestDetailOpen(false)}
+          testSet={chosenTestResult}
+          showCloseButton={true}
+        />
       </Box>
     </Modal>
   )

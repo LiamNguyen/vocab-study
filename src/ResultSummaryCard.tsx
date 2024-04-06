@@ -55,15 +55,17 @@ export const smallerWarningTextStyle = {
 }
 
 interface props {
-  testSet: QuestionResult[]
+  testId?: number,
+  testSet: QuestionResult[],
+  onClick?: (testId: any) => void
 }
 
-export const ResultSummaryCard = ({ testSet }: props) => {
+export const ResultSummaryCard = ({ testId, testSet, onClick }: props) => {
   const noOfCorrect = testSet.filter(i => i.isCorrect).length
   const noOfIncorrect = testSet.filter(i => !i.isCorrect).length
 
   return (
-    <div style={resultSummaryStyle}>
+    <div style={resultSummaryStyle} onClick={() => onClick(testId)}>
       <div style={resultSummaryChartStyle}>
         <PieChart
           series={[

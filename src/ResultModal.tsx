@@ -19,7 +19,7 @@ const style = {
 
 interface props {
   open: boolean,
-  handleClose: () => void
+  onClose: () => void
   questionResult: QuestionResult
 }
 
@@ -27,7 +27,7 @@ const getEmoji = (isCorrect: boolean): string =>
   isCorrect ? 'partying-face' : 'upside-down-face'
 
 
-export const ResultModal = ({ open, handleClose, questionResult }: props) => (
+export const ResultModal = ({ open, onClose, questionResult }: props) => (
   <Modal
     id='result-modal'
     open={open}
@@ -44,7 +44,7 @@ export const ResultModal = ({ open, handleClose, questionResult }: props) => (
         <h3>Your answer: {questionResult.userAnswer}</h3>
       </div>
       <div id='continue-button'>
-        <Button variant='contained' onClick={handleClose}>Continue</Button>
+        <Button variant='contained' onClick={onClose}>Continue</Button>
       </div>
     </Box>
   </Modal>

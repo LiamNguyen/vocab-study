@@ -148,15 +148,15 @@ const App = () => {
         </div>
         <ResultModal
           open={resultModalOpen}
-          handleClose={handleResultModalClose}
+          onClose={handleResultModalClose}
           questionResult={getCurrentQuestion(state.testSet, state.currentQuestionId)}
         />
         <FinalTestResultModal
           open={finalTestResultModalOpen}
-          handleClose={handleFinalTestResultModalClose}
+          onClose={handleFinalTestResultModalClose}
           testSet={state.testSet}
         />
-        <TestHistoryModal open={testHistoryModalOpen} handleClose={() => setTestHistoryModalOpen(false)} />
+        <TestHistoryModal open={testHistoryModalOpen} onClose={() => setTestHistoryModalOpen(false)} />
       </div>) : <div />}
     </div>
   );

@@ -106,7 +106,8 @@ const App = () => {
   }
 
   const handleRestartTest = () => {
-
+    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
+    dispatchUpdateCurrentQuestionId(1)
   }
 
   const handleViewTestHistory = () => {

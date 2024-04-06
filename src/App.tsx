@@ -10,8 +10,8 @@ import { ResultModal } from './ResultModal';
 import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
 import { MAX_QUESTION } from './constants';
-
-
+import { restartButtonStyle, viewHistoryButtonStyle } from './AppStyles';
+import { TestHistoryModal } from './TestHistoryModal/TestHistoryModal';
 
 const reducer = (state: AppState, action: any) => {
   switch (action.type) {
@@ -37,6 +37,7 @@ const App = () => {
   const [userAnswer, setUserAnswer] = useState('')
   const [resultModalOpen, setResultModalOpen] = useState(false)
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
+  const [testHistoryModalOpen, setTestHistoryModalOpen] = useState(false)
 
   useEffect(() => {
     const onGoingTest = fetchOngoingTest()
@@ -100,6 +101,14 @@ const App = () => {
     dispatchUpdateCurrentQuestionId(1)
   }
 
+  const handleRestartTest = () => {
+
+  }
+
+  const handleViewTestHistory = () => {
+    setTestHistoryModalOpen(true)
+  }
+
   return (
     <div className='App'>
       <h1>Suomen kielen sanasto</h1>
@@ -122,6 +131,20 @@ const App = () => {
             <h3>{`${state.currentQuestionId}/${state.testSet.length}`}</h3>
             <Button variant='contained' onClick={checkAnswer}>Next</Button>
           </div>
+          <Button
+            variant='text'
+            style={restartButtonStyle}
+            onClick={handleRestartTest}
+          >
+            Restart test
+          </Button>
+          <Button
+            variant='text'
+            style={viewHistoryButtonStyle}
+            onClick={handleViewTestHistory}
+          >
+            View test history
+          </Button>
         </div>
         <ResultModal
           open={resultModalOpen}
@@ -133,8 +156,8 @@ const App = () => {
           handleClose={handleFinalTestResultModalClose}
           testSet={state.testSet}
         />
+        <TestHistoryModal open={testHistoryModalOpen} handleClose={() => setTestHistoryModalOpen(false)} />
       </div>) : <div />}
-
     </div>
   );
 }

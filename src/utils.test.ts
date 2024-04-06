@@ -1,4 +1,5 @@
-import { isAnswerCorrect } from './utils'
+import { Question, QuestionResultWithoutId } from './types'
+import { addQuestionId, isAnswerCorrect } from './utils'
 
 describe('isAnswerCorrect function', () => {
   it('should return true for exact match', () => {
@@ -52,4 +53,20 @@ describe('isAnswerCorrect function', () => {
     const correctAnswer = ''
     expect(isAnswerCorrect(userAnswer, correctAnswer)).toBeFalsy()
   })
+})
+
+test('addQuestionId', () => {
+  const mockWordList: QuestionResultWithoutId[] = [
+    { question: "Hei", correctAnswer: "Hello" },
+    { question: "ja", correctAnswer: "and" },
+    { question: "Tervetuloa!", correctAnswer: "Welcome!" },
+    { question: "Moi!", correctAnswer: "Hi!" },
+    { question: "Anteeksi!", correctAnswer: "Excuse me!" },
+    { question: "onko", correctAnswer: "is" },
+    { question: "täällä", correctAnswer: "here" }
+  ]
+  const wordListWithId = addQuestionId(mockWordList)
+
+  expect(wordListWithId[0].id).toEqual(1)
+  expect(wordListWithId[5].id).toEqual(6)
 })

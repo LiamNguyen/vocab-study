@@ -72,15 +72,16 @@ export const ResultSummaryCard = ({ testSet }: props) => {
                 { id: 0, value: noOfCorrect, color: '#3eb489' },
                 { id: 1, value: noOfIncorrect, color: '#FF5F15' }
               ],
-              innerRadius: 20,
-              outerRadius: 50,
+              innerRadius: 15,
+              outerRadius: 35,
               paddingAngle: 5,
               cornerRadius: 5,
-              cy: 60
+              cy: 60,
+              cx: 40
             }
           ]}
-          width={200}
-          height={200}
+          width={100}
+          height={100}
         />
       </div>
       <div style={resultSummaryStatsStyle}>

@@ -1,4 +1,5 @@
 import { PieChart } from "@mui/x-charts"
+import * as dayjs from 'dayjs'
 
 import { QuestionResult } from "./types"
 
@@ -54,45 +55,62 @@ export const smallerWarningTextStyle = {
   fontSize: '20px'
 }
 
-interface props {
-  testId?: number,
-  testSet: QuestionResult[],
-  onClick?: (testId: any) => void
+export const dateContainerStyle: any = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  paddingRight: '10px'
 }
 
-export const ResultSummaryCard = ({ testId, testSet, onClick }: props) => {
+export const dateStyle = {
+  color: '#b6ffbb',
+  fontSize: '15px'
+}
+
+interface props {
+  testId?: number
+  testSet: QuestionResult[]
+  onClick?: (testId: any) => void
+  date?: Date
+}
+
+export const ResultSummaryCard = ({ testId, testSet, onClick, date }: props) => {
   const noOfCorrect = testSet.filter(i => i.isCorrect).length
   const noOfIncorrect = testSet.filter(i => !i.isCorrect).length
 
   return (
-    <div style={resultSummaryStyle} onClick={() => onClick(testId)}>
-      <div style={resultSummaryChartStyle}>
-        <PieChart
-          series={[
-            {
-              data: [
-                { id: 0, value: noOfCorrect, color: '#3eb489' },
-                { id: 1, value: noOfIncorrect, color: '#FF5F15' }
-              ],
-              innerRadius: 15,
-              outerRadius: 35,
-              paddingAngle: 5,
-              cornerRadius: 5,
-              cy: 60,
-              cx: 40
-            }
-          ]}
-          width={100}
-          height={100}
-        />
+    <div>
+      <div style={dateContainerStyle}>
+        {date && <span style={dateStyle}>{dayjs(date).format('DD-MM-YY HH:mm')}</span>}
       </div>
-      <div style={resultSummaryStatsStyle}>
-        <div style={statTextStyle}>
-          <div style={textStyle}>
-            Correct <b>{noOfCorrect}</b>
-          </div>
-          <div style={warningTextStyle}>
-            Incorrect <b>{noOfIncorrect}</b>
+      <div style={resultSummaryStyle} onClick={() => onClick(testId)}>
+        <div style={resultSummaryChartStyle}>
+          <PieChart
+            series={[
+              {
+                data: [
+                  { id: 0, value: noOfCorrect, color: '#3eb489' },
+                  { id: 1, value: noOfIncorrect, color: '#FF5F15' }
+                ],
+                innerRadius: 15,
+                outerRadius: 35,
+                paddingAngle: 5,
+                cornerRadius: 5,
+                cy: 60,
+                cx: 40
+              }
+            ]}
+            width={100}
+            height={100}
+          />
+        </div>
+        <div style={resultSummaryStatsStyle}>
+          <div style={statTextStyle}>
+            <div style={textStyle}>
+              Correct <b>{noOfCorrect}</b>
+            </div>
+            <div style={warningTextStyle}>
+              Incorrect <b>{noOfIncorrect}</b>
+            </div>
           </div>
         </div>
       </div>

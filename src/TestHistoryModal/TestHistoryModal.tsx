@@ -38,7 +38,7 @@ export const TestHistoryModal = ({ open, onClose, testHistory }: props) => {
       <Box sx={boxStyle}>
         <div style={resultContainerStyle}>
           {testHistory.map(({ id, testResult, createdAt }) => (
-            <div>
+            <div key={id}>
               <ResultSummaryCard key={id} testId={id} date={createdAt} testSet={testResult} onClick={handleCardClick} />
             </div>
           ))}

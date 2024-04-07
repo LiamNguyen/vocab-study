@@ -14,9 +14,9 @@ import { QuestionResult, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
 import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, fetchTestHistory, getCurrentQuestion, markResultAsCorrect, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
-import { MAX_QUESTION } from './constants';
 import { restartButtonStyle, viewHistoryButtonStyle } from './AppStyles';
 import { TestHistoryModal } from './TestHistoryModal/TestHistoryModal';
+import { TestDesignModal } from './TestDesignModal';
 
 const reducer = (state: AppState, action: any) => {
   switch (action.type) {
@@ -40,6 +40,7 @@ const reducer = (state: AppState, action: any) => {
 const App = () => {
   const [state, dispatch] = useReducer(reducer, { testSet: [], currentQuestionId: 1 })
   const [userAnswer, setUserAnswer] = useState('')
+  const [testDesignModalOpen, setTestDesignModalOpen] = useState(false)
   const [resultModalOpen, setResultModalOpen] = useState(false)
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
   const [testHistoryModalOpen, setTestHistoryModalOpen] = useState(false)
@@ -49,12 +50,12 @@ const App = () => {
 
   useEffect(() => {
     const onGoingTest = fetchOngoingTest()
+
     if (onGoingTest?.length > 0) {
       dispatchUpdateTestSet(onGoingTest)
       dispatchUpdateCurrentQuestionId(fetchCurrentQuestionId())
     } else {
-      dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
-      dispatchUpdateCurrentQuestionId(1)
+      setTestDesignModalOpen(true)
     }
   }, [])
 
@@ -106,9 +107,7 @@ const App = () => {
 
   const handleFinalTestResultModalClose = () => {
     setfinalTestResultModalOpen(false)
-
-    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
-    dispatchUpdateCurrentQuestionId(1)
+    setTestDesignModalOpen(true)
   }
 
   const handleRestartButtonClick = () => {
@@ -126,15 +125,20 @@ const App = () => {
   }
 
   const handleRestartTest = () => {
-    dispatchUpdateTestSet(designTestSet(vocabulary, MAX_QUESTION))
-    dispatchUpdateCurrentQuestionId(1)
     setRestartDialogOpen(false)
+    setTestDesignModalOpen(true)
   }
 
   const handleCorrectAnswerSwitchChange = (switchActive: boolean) => {
     const updatedResult = markResultAsCorrect(state.testSet, state.currentQuestionId, switchActive)
 
     dispatchUpdateTestSet(updatedResult)
+  }
+
+  const handleDesignTest = (noOfQuestion: number, kappale: number[]) => {
+    dispatchUpdateTestSet(designTestSet(vocabulary, noOfQuestion))
+    dispatchUpdateCurrentQuestionId(1)
+    setTestDesignModalOpen(false)
   }
 
   return (
@@ -204,6 +208,10 @@ const App = () => {
           </DialogActions>
         </Dialog>
       </div>) : <div />}
+      <TestDesignModal
+        open={testDesignModalOpen}
+        onClose={handleDesignTest}
+      />
     </div>
   );
 }

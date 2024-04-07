@@ -7,7 +7,7 @@ import Switch from '@mui/material/Switch';
 
 import { QuestionResult } from './types';
 import { resultSummaryStatsStyle, smallerTextStyle, smallerWarningTextStyle } from './ResultSummaryCard';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const style = {
   position: 'absolute',
@@ -21,25 +21,54 @@ const style = {
   backgroundColor: '#cdffd0'
 };
 
-interface props {
-  open: boolean,
-  onClose: () => void
-  questionResult: QuestionResult
-}
-
 const getEmoji = (isCorrect: boolean): string =>
   isCorrect ? 'partying-face' : 'upside-down-face'
 
+interface props {
+  open: boolean
+  onClose: () => void
+  onSwitch: (switchActive: boolean) => void
+  questionResult: QuestionResult
+}
+
+// const reducer = (state: AppState, action: any) => {
+//   switch (action.type) {
+//     case ActionName.UPDATE_TEST_SET:
+//       const newTestSet = action.testSet
+
+//       storeOngoingTest(newTestSet)
+
+//       return { ...state, testSet: newTestSet }
+//     case ActionName.UPDATE_QUESTION_ID:
+//       const updatedCurrentQuestionId = action.currentQuestionId
+
+//       storeCurrentQuestionId(updatedCurrentQuestionId)
+
+//       return { ...state, currentQuestionId: updatedCurrentQuestionId }
+//     default:
+//       return
+//   }
+// } 
 
 export const ResultModal = ({
   open,
   onClose,
+  onSwitch,
   questionResult: { isCorrect, correctAnswer, userAnswer }
 }: props) => {
-  const [switchState, setSwitchState] = useState(false)
+  const [switchActive, setSwitchActive] = useState(false)
+
+  useEffect(() => {
+    if (switchActive) {
+      setSwitchActive(false)
+    }
+  }, [open])
 
   const handleSwitchChange = () => {
-    setSwitchState(!switchState)
+    const currentState = !switchActive
+
+    setSwitchActive(currentState)
+    onSwitch(currentState)
   }
 
   return (
@@ -62,7 +91,12 @@ export const ResultModal = ({
             Your answer <b>{userAnswer}</b>
           </div>
         </div>
-        {/* <FormControlLabel control={<Switch />} label='Mark as correct' onChange={handleSwitchChange} /> */}
+        {<FormControlLabel
+          control={
+            <Switch checked={switchActive} onChange={handleSwitchChange} />
+          }
+          label='Mark as correct'
+        />}
         <div id='continue-button'>
           <Button variant='contained' onClick={onClose}>Continue</Button>
         </div>

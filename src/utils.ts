@@ -157,3 +157,16 @@ export const updateTestResult = (
     }
   })
 }
+
+export const markResultAsCorrect = (
+  testSet: QuestionResult[],
+  currentQuestionId: number,
+  isAnswerCorrect: boolean
+): QuestionResult[] => testSet.map((questionResult: QuestionResult) => {
+  if (questionResult.id !== currentQuestionId) return { ...questionResult }
+
+  return {
+    ...questionResult,
+    isCorrect: isAnswerCorrect
+  }
+})

@@ -2,8 +2,6 @@ import { Button } from '@mui/material'
 import { useEffect, useReducer, useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { orderBy } from 'lodash';
 
@@ -14,10 +12,10 @@ import { vocabulary } from './assets/vocabulary'
 import { CssTextField } from './CssTextField';
 import { QuestionResult, AppState, ActionName } from './types';
 import { ResultModal } from './ResultModal';
-import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, fetchTestHistory, getCurrentQuestion, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
+import { designTestSet, fetchCurrentQuestionId, fetchOngoingTest, fetchTestHistory, getCurrentQuestion, markResultAsCorrect, storeCurrentQuestionId, storeOngoingTest, updateTestHistory, updateTestResult } from './utils';
 import { FinalTestResultModal } from './FinalTestResultModal/FinalTestResultModal';
 import { MAX_QUESTION } from './constants';
-import { restartButtonStyle, restartDialogStyle, viewHistoryButtonStyle } from './AppStyles';
+import { restartButtonStyle, viewHistoryButtonStyle } from './AppStyles';
 import { TestHistoryModal } from './TestHistoryModal/TestHistoryModal';
 
 const reducer = (state: AppState, action: any) => {
@@ -46,6 +44,7 @@ const App = () => {
   const [finalTestResultModalOpen, setfinalTestResultModalOpen] = useState(false)
   const [testHistoryModalOpen, setTestHistoryModalOpen] = useState(false)
   const [restartDialogOpen, setRestartDialogOpen] = useState(false)
+
   const testHistory = fetchTestHistory()
 
   useEffect(() => {
@@ -132,6 +131,12 @@ const App = () => {
     setRestartDialogOpen(false)
   }
 
+  const handleCorrectAnswerSwitchChange = (switchActive: boolean) => {
+    const updatedResult = markResultAsCorrect(state.testSet, state.currentQuestionId, switchActive)
+
+    dispatchUpdateTestSet(updatedResult)
+  }
+
   return (
     <div className='App'>
       <h1>Suomen kielen sanasto</h1>
@@ -172,6 +177,7 @@ const App = () => {
         <ResultModal
           open={resultModalOpen}
           onClose={handleResultModalClose}
+          onSwitch={handleCorrectAnswerSwitchChange}
           questionResult={getCurrentQuestion(state.testSet, state.currentQuestionId)}
         />
         <FinalTestResultModal

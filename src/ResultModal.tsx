@@ -7,7 +7,7 @@ import Switch from '@mui/material/Switch';
 
 import { QuestionResult } from './types';
 import { resultSummaryStatsStyle, smallerTextStyle, smallerWarningTextStyle } from './ResultSummaryCard';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 
 const style = {
   position: 'absolute',
@@ -31,24 +31,22 @@ interface props {
   questionResult: QuestionResult
 }
 
-// const reducer = (state: AppState, action: any) => {
-//   switch (action.type) {
-//     case ActionName.UPDATE_TEST_SET:
-//       const newTestSet = action.testSet
+interface ResultModalState {
+  originalResult: { isCorrect: boolean }
+}
 
-//       storeOngoingTest(newTestSet)
+const UPDATE_ORIGINAL_RESULT = 'UPDATE_ORIGINAL_RESULT'
 
-//       return { ...state, testSet: newTestSet }
-//     case ActionName.UPDATE_QUESTION_ID:
-//       const updatedCurrentQuestionId = action.currentQuestionId
+const reducer = (state: ResultModalState, action: any) => {
+  switch (action.type) {
+    case UPDATE_ORIGINAL_RESULT:
+      const { originalResult: { isCorrect } } = action
 
-//       storeCurrentQuestionId(updatedCurrentQuestionId)
-
-//       return { ...state, currentQuestionId: updatedCurrentQuestionId }
-//     default:
-//       return
-//   }
-// } 
+      return { ...state, originalResult: { isCorrect } }
+    default:
+      return
+  }
+}
 
 export const ResultModal = ({
   open,
@@ -56,12 +54,21 @@ export const ResultModal = ({
   onSwitch,
   questionResult: { isCorrect, correctAnswer, userAnswer }
 }: props) => {
+  const [state, dispatch] = useReducer(reducer, { originalResult: { isCorrect: false } })
   const [switchActive, setSwitchActive] = useState(false)
+
+  const dispatchUpdateOriginalResult = (originalResult: { isCorrect: boolean }) => {
+    dispatch({ type: UPDATE_ORIGINAL_RESULT, originalResult })
+  }
 
   useEffect(() => {
     if (switchActive) {
       setSwitchActive(false)
     }
+    if (open) {
+      dispatchUpdateOriginalResult({ isCorrect })
+    }
+    // eslint-disable-next-line
   }, [open])
 
   const handleSwitchChange = () => {
@@ -91,7 +98,7 @@ export const ResultModal = ({
             Your answer <b>{userAnswer}</b>
           </div>
         </div>
-        {<FormControlLabel
+        {!state.originalResult.isCorrect && <FormControlLabel
           control={
             <Switch checked={switchActive} onChange={handleSwitchChange} />
           }

@@ -136,7 +136,7 @@ const App = () => {
   }
 
   const handleDesignTest = (noOfQuestion: number, kappale: number[]) => {
-    dispatchUpdateTestSet(designTestSet(vocabulary, noOfQuestion))
+    dispatchUpdateTestSet(designTestSet(vocabulary, noOfQuestion, kappale))
     dispatchUpdateCurrentQuestionId(1)
     setTestDesignModalOpen(false)
   }

@@ -20,14 +20,15 @@ export interface Kappale {
 }
 
 export interface Question {
-  fi: string,
-  en: string,
+  fi: string
+  en: string
+  kappale: number
 }
 
 export interface QuestionResultWithoutId {
-  question: string,
-  correctAnswer: string,
-  userAnswer?: string,
+  question: string
+  correctAnswer: string
+  userAnswer?: string
   isCorrect?: boolean
 }
 
@@ -37,11 +38,11 @@ export interface QuestionResult extends QuestionResultWithoutId {
 
 export interface TestHistory {
   id: number,
-  testResult: QuestionResult[],
+  testResult: QuestionResult[]
   createdAt: Date
 }
 
 export interface AppState {
-  testSet: QuestionResult[],
+  testSet: QuestionResult[]
   currentQuestionId: number
 }

@@ -129,16 +129,26 @@ export const addQuestionId = (testSet: QuestionResultWithoutId[]) => {
   })
 }
 
-export const getCurrentQuestion = (testSet: QuestionResult[], currentQuestionId: number): QuestionResult =>
-  find(testSet, matchesProperty('id', currentQuestionId))
+export const filterByKappale = (testSet: Question[], chosenKappale: number[]): Question[] => (
+  testSet.filter(test => chosenKappale.includes(test.kappale))
+)
 
-export const designTestSet = (testSet: Question[], numberOfQuestion: number): QuestionResult[] => {
+export const designTestSet = (
+  testSet: Question[],
+  numberOfQuestion: number,
+  chosenKappale: number[]
+): QuestionResult[] => {
   const shuffledList = shuffle(testSet)
-  const randomizeLangSelectionList = randomizeLangSelection(shuffledList)
+  const filteredByKappaleList = filterByKappale(shuffledList, chosenKappale)
+  const randomizeLangSelectionList = randomizeLangSelection(filteredByKappaleList)
   const testSetWithQuestionId = addQuestionId(randomizeLangSelectionList)
 
   return slice(testSetWithQuestionId, 0, numberOfQuestion)
 }
+
+export const getCurrentQuestion = (testSet: QuestionResult[], currentQuestionId: number): QuestionResult => (
+  find(testSet, matchesProperty('id', currentQuestionId))
+)
 
 export const updateTestResult = (
   testSet: QuestionResult[],
